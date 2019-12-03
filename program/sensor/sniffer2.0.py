@@ -38,10 +38,10 @@ def sniffer():
 
             #TCP
             elif proto == 6:
-                (src_port, dest_port, sequence, acknoqledgment, flag_urg, flag_ack, flag_psh, flag_rst, flag_syn, flag_fin, data) = tcp_segment(data)
+                (src_port, dest_port, sequence, acknowledgment, flag_urg, flag_ack, flag_psh, flag_rst, flag_syn, flag_fin, data) = tcp_segment(data)
                 print(TAB_1 + 'TCP Segment:')
                 print(TAB_2 + 'Source Port: {}, Destination Port: {}'.format(src_port, dest_port))
-                print(TAB_2 + 'Sequence: {}, Acknowledgement: {}'.format(sequence, acknowledgement))
+                print(TAB_2 + 'Sequence: {}, Acknowledgement: {}'.format(sequence, acknowledgment))
                 print(TAB_2 + 'Flags:')
                 print(TAB_3 + 'URG: {}, ACK: {}, PSH: {}, RST: {}, SYN: {}, FIN: {}'.format(flag_urg, flag_ack, flag_psh, flag_rst, flag_syn, flag_fin))
                 print(TAB_2 + 'Data:')
