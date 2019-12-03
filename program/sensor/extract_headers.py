@@ -1,3 +1,5 @@
+#Extraction functions for headers for modularization, belongs to none working version of sniffer
+
 import struct
 
 def extract_ethernet_header(packet):
