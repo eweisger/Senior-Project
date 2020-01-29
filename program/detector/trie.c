@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include "trie.h"
 
-#define set_size 100
+#define set_size 4
 
 trie* create_trie(){
 	trie* trie = (trie*)malloc(sizeof(trie));
@@ -51,17 +51,3 @@ bool search(trie* trie, char* str){
 	
 	return true;
 }
-
-bool deletion(trie* trie, char* str){
-	/*Stuff Here*/
-}
-
-bool have_children(node* current){
-	for(int i = 0; i < set_size; i++)
-		if(current->child[i])
-			return true;
-
-	return false;
-}
-
-
