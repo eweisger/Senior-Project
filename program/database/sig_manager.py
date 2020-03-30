@@ -2,7 +2,7 @@ import re
 
 def sig_manager(user_input):
     if user_input.casefold() is "printsigs":
-        print_sigs()
+        sig_print()
         return True
 
     user_input = user_input.split()
@@ -31,6 +31,7 @@ def sig_check(user_input):
         name = format_name(name)
         if name is False:
             print("The input {} is not a proper name".format(name))
+            print("Names cannot begin with a space or contain a \"|\"")
             return
 
        if check_name(name) is True:
@@ -46,6 +47,7 @@ def sig_check(user_input):
         cve = format_cve(cve)
         if cve is False:
             print("The input {} is not a proper CVE".format(cve))
+            print("CVEs must be in the format cve-yyyy-nnnn with at least 4 digits in the sequence number portion of the id")
             return
 
         if check_cve(cve) is True:
@@ -59,6 +61,7 @@ def sig_check(user_input):
     signature = format_signature(signature)
     if signature is False:
         print("The input {} is not a proper signature".format(signature))
+        print("Signatures must be in the format \xnn repeated, where n is 0-9 or a-f")
         return
 
     if check_sig(signature) is True:
@@ -78,6 +81,7 @@ def sig_add(user_input):
     signature = format_signature(signature)
     if signature is False:
         print("The input {} is not a proper signature".format(signature))
+        print("Signatures must be in the format \xnn repeatable, where n is 0-9 or a-f")
         return
 
     if check_sig(signature) is True:
@@ -101,6 +105,7 @@ def sig_add(user_input):
             name = format_name(name)
             if name is False:
                 print("The input {} is not a proper name".format(name))
+                print("Names cannot begin with a space or contain a \"|\"")
                 return
 
             if check_name(name) is True:
@@ -124,6 +129,7 @@ def sig_add(user_input):
             platform = format_platform(platform)
             if platform is False:
                 print("The input {} is not a proper platform".format(platform))
+                print("Platforms cannot begin with a space or contain a \"|\"")
                 return
 
             p = True
@@ -143,6 +149,7 @@ def sig_add(user_input):
             service = format_service(service)
             if service is False:
                 print("The input {} is not a proper service".format(service))
+                print("Services cannot begin with a space or contain a \"|\"")
                 return
 
             s = True
@@ -162,6 +169,7 @@ def sig_add(user_input):
             rank = format_rank(rank)
             if rank is False:
                 print("The input {} is not a proper rank".format(rank))
+                print("Ranks cannot begin with a space or contain a \"|\"")
                 return
 
             r = True
@@ -180,7 +188,8 @@ def sig_add(user_input):
 
             disclosed = format_disclosed(disclosed)
             if disclosed if False:
-                print("The input {} is not a proper disclose date".format(disclosed))
+                print("The input {} is not a proper disclosure date".format(disclosed))
+                print("Disclosure dates must be in the form yyyy-mm-dd or yyyy-mm")
                 return
 
             d = True
@@ -200,6 +209,7 @@ def sig_add(user_input):
             cve = format_cve(cve)
             if cve is False:
                 print("The input {} us not a proper CVE".format(cve))
+                print("CVEs must be in the format cve-yyyy-nnnn with at least 4 digits in the sequence number portion of the id")
                 return
 
             if check_cve(cve) is True:
@@ -209,7 +219,8 @@ def sig_add(user_input):
             c = True
 
     if n is False:
-        name = " "
+        print("The signature must have a unique name associated with it")
+        return
 
     if p is False:
         platform = " "
@@ -237,6 +248,7 @@ def sig_remove(user_input):
         name = format_name(name)
         if name is False:
             print("The input {} is not a proper name".format(name))
+            print("Names cannot begin with a space or contain a \"|\"")
             return
 
         if check_name(name) is True:
@@ -261,6 +273,7 @@ def sig_remove(user_input):
         cve = format_cve(cve)
         if cve is False:
             print("The input {} is not a proper CVE".format(cve))
+            print("CVEs must be in the format cve-yyyy-nnnn with at least 4 digits in the sequence number portion of the id")
             return
 
         if check_cve(cve) is True:
@@ -283,6 +296,7 @@ def sig_remove(user_input):
     signature = format_signature(signature)
     if signature is False:
         print("The input {} is not a proper signature".format(signature))
+        print("Signatures must be in the format \xnn repeatable, where n is 0-9 or a-f")
         return
 
     if check_sig(signature) is True:
@@ -301,7 +315,7 @@ def sig_remove(user_input):
     print("The signature {} is not in the signature list".format(signature))
 
 
-def print_sigs():
+def sig_print():
     print("\n")
     print("Signatures")
     print("----------")
@@ -382,7 +396,7 @@ def format_name(name):
 
 def format_platform(platform):
     platform = platform.strip("\n")
-    re_platform = re.complie("^(\S+)|(\S+( \S+)+)$")
+    re_platform = re.complie("^([^\s\|]+)|([^\s\|]+( [^\s\|]+)+)$")
     if re_platform.match(platform) is None:
         return False
 
@@ -392,7 +406,7 @@ def format_platform(platform):
 def format_service(service):
     service = service.strip("\n")
     service = service.casefold()
-    re_service = re.complie("^(\S+)|(\S+( \S+)+)$")
+    re_service = re.complie("^([^\s\|]+)|([^\s\|]+( [^\s\|]+)+)$")
     if re_service.match(service) is None:
         return False
 
@@ -402,7 +416,7 @@ def format_service(service):
 def format_rank(rank):
     rank = rank.strip("\n")
     rank = rank.casefold()
-    re_rank = re.complie("^excellent|great|good|normal|average|low|manual$")
+    re_rank = re.complie("^([^\s\|]+)|([^\s\|]+( [^\s\|]+)+)$")
     if re_rank.match(rank) is None:
         return False
 
