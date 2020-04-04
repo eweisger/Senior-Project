@@ -1,15 +1,21 @@
-#from sensor.sniffer import sniffer
-#from databse.database import build_database
-#from program.database.list_manager import list_manager
+from sensor.sniffer import nids_sniffer, packet_sniffer
+from detector.detector import build_signature_database
+from database.list_manager import list_manager
+from database.alert_manager import alert_manager
+from database.sig_manager import sig_manager
 
 def command_prompt():
     welcome_message()
     
     #If files don't exist create them
-    open("database/alerts.txt", "a")
-    open("database/signatures.txt", "a")
-    open("database/whitelist.txt", "a")
-    open("database/blacklist.txt", "a")
+    a = open("database/alerts.txt", "a")
+    a.close()
+    s = open("database/signatures.txt", "a")
+    s.close()
+    w = open("database/whitelist.txt", "a")
+    w.close()
+    b = open("database/blacklist.txt", "a")
+    b.close()
     
     user_input = ""
     while user_input.casefold() != "exit":
@@ -18,11 +24,26 @@ def command_prompt():
         if user_input.casefold() == "help":
             help()
 
+        elif user_input.casefold() == "runsniffer":
+            run_sniffer()
+
+        elif user_input.casefold() == "runNIDS":
+            run_NIDS()
+
+        elif list_manager(user_input) == True:
+            pass
+
+        elif sig_manager(user_input) == True:
+            pass
+
+        elif alert_manager(user_input) == True:
+            pass
+
 
 def welcome_message():
     with open("welcome_image.txt") as image:
         for line in image:
-            print(line.strip("\n"))
+            print(line.rstrip())
 
     print("                                    ___ _                ")
     print("| | _  |  _  _ __  _    _|_ _    |\| | | \|_| _    __  _|")
@@ -34,9 +55,9 @@ def run_sniffer():
     print("Running Packet Sniffer")
     print("----------------------")
     print("Type \"stop\" to stop the sniffer and exit back to the command prompt")
-    user_input = None
+    user_input = ""
     while user_input.casefold() != "stop":
-        user_input = input("Scanner>>")
+        user_input = input("Sniffer >>")
         packet_sniffer()
 
 
@@ -46,19 +67,20 @@ def run_NIDS():
     print("Running Network Intrusion Detection System")
     print("------------------------------------------")
     print("Type \"stop\" to stop the scanner and exit back to the command prompt")
-    user_input = None
+    user_input = ""
     while user_input.casefold() != "stop":
-        user_input =  input("Scanner >>")
+        user_input =  input("NIDS >>")
         nids_sniffer()
 
 
 def help():
     print("General Commands")
     print("----------------")
+    print("The packet sniffer will copy all packets to a text file called \"sniffer_output.txt\" in the program's main directory")
     print("   help \t\t prints a list of the commands for the user")
     print("   runsniffer \t\t runs the packet sniffer"+
                          "\n\t\t\t    \"stop\" will stop the packet sniffer")
-    print("   runnids \t\t runs the network intrusion detection system"+
+    print("   runNIDS \t\t runs the network intrusion detection system"+
                          "\n\t\t\t    \"stop\" will stop the the network intrusion detection system")
     print("   printalerts \t\t print recorded alerts")
     print("   clearalerts \t\t clears all recorded alerts")
@@ -80,6 +102,11 @@ def help():
     print("")
     print("Signature Commands")
     print("------------------")
+    print("The names associated with signatures are case sensitive, while the signatures themselves and CVEs are not\n" +
+          "Names, platforms, services, and ranks cannot contain a \"|\"\n" +
+          "CVEs must be of the format cve-yyyy-nnnn with at least 4 digits in the sequence number portion of the id\n" +
+          "Signatures must be in the form \\xnn where n is a-f or 0-9\n" +
+          "Disclosure dates must be in the form yyyy-mm-dd or yyyy-mm\n")
     print("   checksig signature \t checks if a signature is in the database" +
                          "\n\t\t\t    \"checksig -n name\" searches by signature name" +
                          "\n\t\t\t    \"checksig -c cve\" searches by signature CVE")

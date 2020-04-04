@@ -1,5 +1,5 @@
-import pyahocorasick
 from collections import namedtuple
+from detector.detector import scan_packet
 
 import socket
 import struct
@@ -76,7 +76,7 @@ def nids_sniffer():
 
 
 def packet_sniffer():
-    output = open('scanner_output.txt', 'w')
+    output = open('sniffer_output.txt', 'w+')
 
     conn = socket.socket(socket.AF_PACKET, socket.SOCK_RAW, socket.ntohs(3))
 
