@@ -1,4 +1,6 @@
 import re
+import ahocorasick
+import pickle
 
 def test():
     user_input = "test test test".split()
@@ -47,7 +49,23 @@ def test5():
     if user_input == "":
         print("yes")
 
+def test6():
+    A = ahocorasick.Automaton()
+    for index, key in enumerate('he her hers she'.split()):
+        A.add_word(key, index)
+
+    print(A.get('he'))
+
+    A.make_automaton()
+
+    print(A.get('he'))
+
+    string = 'hehibrugshregrhgrkerherhaufeaheshe'
+    for index, value in A.iter(string):
+        print(index,value)
+
+
 if __name__ == "__main__":
-    test5()
+    test6()
 
 

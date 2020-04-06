@@ -230,7 +230,7 @@ def sig_add(user_input):
     if cve == "":
         cve = " "
 
-    with open("signatures.txt", "a") as signatures:
+    with open("database/signatures.txt", "a") as signatures:
         signatures.write(name + " | " + platform + " | " + service + " | " + rank + " | " + disclosed + " | " + cve + " | " + signature + "\n")
 
 
@@ -250,8 +250,8 @@ def sig_remove(user_input):
 
         if check_name(name) == True:
             #check if file is empty to avoid index out of bounds error
-            if os.stat("signatures.txt").st_size != 1:
-                with open("signatures.txt", "r+") as signatures:
+            if os.stat("database/signatures.txt").st_size != 1:
+                with open("database/signatures.txt", "r+") as signatures:
                     lines = signatures.readlines()
                     signatures.seek(0)
                     signatures.truncate()
@@ -277,8 +277,8 @@ def sig_remove(user_input):
 
         if check_cve(cve) == True:
             #check if file is empty to avoid index out of bounds error
-            if os.stat("signatures.txt").st_size != 1:
-                with open("signatures.txt", "r+") as signatures:
+            if os.stat("database/signatures.txt").st_size != 1:
+                with open("database/signatures.txt", "r+") as signatures:
                     lines = signatures.readlines()
                     signatures.seek(0)
                     signatures.truncate()
@@ -302,8 +302,8 @@ def sig_remove(user_input):
 
     if check_sig(signature) == True:
         #check if file is empty to avoid index out of bounds error
-        if os.stat("signatures.txt").st_size != 1:
-            with open("signatures.txt", "r+") as signatures:
+        if os.stat("database/signatures.txt").st_size != 1:
+            with open("database/signatures.txt", "r+") as signatures:
                 lines = signatures.readlines()
                 signatures.seek(0)
                 signatures.truncate()
@@ -323,8 +323,8 @@ def sig_print():
     print("Signatures")
     print("----------")
     #check if file is empty to avoid index out of bounds error
-    if os.stat("signatures.txt").st_size != 1:
-        with open("signatures.txt", "r") as siglist:
+    if os.stat("database/signatures.txt").st_size != 1:
+        with open("database/signatures.txt", "r") as siglist:
             for line in siglist:
                 parsed_line = line.strip()
                 parsed_line = parsed_line.split(" | ")
@@ -335,8 +335,8 @@ def sig_print():
 
 def check_sig(signature):
     #Check if file is empty to avoid index out of bounds error
-    if os.stat("signatures.txt").st_size != 1:
-        with open("signatures.txt", "r") as signatures:
+    if os.stat("database/signatures.txt").st_size != 1:
+        with open("database/signatures.txt", "r") as signatures:
             for line in signatures:
                 parsed_line = line.strip()
                 parsed_line = parsed_line.split(" | ")
@@ -347,8 +347,8 @@ def check_sig(signature):
 
 def check_name(name):
     #Check if file is empty to avoid index out of bounds error
-    if os.stat("signatures.txt").st_size != 1:
-        with open("signatures.txt", "r") as signatures:
+    if os.stat("database/signatures.txt").st_size != 1:
+        with open("database/signatures.txt", "r") as signatures:
             for line in signatures:
                 parsed_line = line.strip()
                 parsed_line = parsed_line.split(" | ")
@@ -359,8 +359,8 @@ def check_name(name):
 
 def check_cve(cve):
     #check if file is empty to avoid index out of bounds error
-    if os.stat("signatures.txt").st_size != 1:
-        with open("signatures.txt", "r") as signatures:
+    if os.stat("database/signatures.txt").st_size != 1:
+        with open("database/signatures.txt", "r") as signatures:
             for line in signatures:
                 parsed_line = line.strip()
                 parsed_line = parsed_line.split(" | ")
@@ -390,6 +390,7 @@ def format_disclosed(disclosed):
 
 def format_cve(cve):
     cve = cve.strip()
+    cve = cve.casefold()
     re_cve = re.compile("^cve-[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]+$")
     if re_cve.match(cve) == None:
         return False, cve
@@ -417,7 +418,6 @@ def format_platform(platform):
 
 def format_service(service):
     service = service.strip()
-    service = service.casefold()
     re_service = re.compile("^[^|]+$")
     if re_service.match(service) == None:
         return False, service
@@ -427,7 +427,6 @@ def format_service(service):
 
 def format_rank(rank):
     rank = rank.strip()
-    rank = rank.casefold()
     re_rank = re.compile("^[^|]+$")
     if re_rank.match(rank) == None:
         return False, rank

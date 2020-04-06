@@ -27,7 +27,7 @@ def command_prompt():
         elif user_input.casefold() == "runsniffer":
             run_sniffer()
 
-        elif user_input.casefold() == "runNIDS":
+        elif user_input.casefold() == "runnids":
             run_NIDS()
 
         elif list_manager(user_input) == True:
@@ -54,11 +54,8 @@ def welcome_message():
 def run_sniffer():
     print("Running Packet Sniffer")
     print("----------------------")
-    print("Type \"stop\" to stop the sniffer and exit back to the command prompt")
-    user_input = ""
-    while user_input.casefold() != "stop":
-        user_input = input("Sniffer >>")
-        packet_sniffer()
+    print("Type \"stop\" to stop the sniffer and exit back to the command prompt\n")
+    packet_sniffer()
 
 
 def run_NIDS():
@@ -66,11 +63,8 @@ def run_NIDS():
     build_signature_database()
     print("Running Network Intrusion Detection System")
     print("------------------------------------------")
-    print("Type \"stop\" to stop the scanner and exit back to the command prompt")
-    user_input = ""
-    while user_input.casefold() != "stop":
-        user_input =  input("NIDS >>")
-        nids_sniffer()
+    print("Type \"stop\" to stop the scanner and exit back to the command prompt\n")
+    nids_sniffer()
 
 
 def help():
@@ -80,7 +74,7 @@ def help():
     print("   help \t\t prints a list of the commands for the user")
     print("   runsniffer \t\t runs the packet sniffer"+
                          "\n\t\t\t    \"stop\" will stop the packet sniffer")
-    print("   runNIDS \t\t runs the network intrusion detection system"+
+    print("   runnids \t\t runs the network intrusion detection system"+
                          "\n\t\t\t    \"stop\" will stop the the network intrusion detection system")
     print("   printalerts \t\t print recorded alerts")
     print("   clearalerts \t\t clears all recorded alerts")

@@ -1,8 +1,9 @@
-from collections import namedtuple
+import collections
 from detector.detector import scan_packet
 
 import socket
 import struct
+import textwrap
 
 TAB_1 = '\t - '
 TAB_2 = '\t\t - '
@@ -19,24 +20,24 @@ def nids_sniffer():
 
     while True:
         raw_data, addr = conn.recvfrom(65536)
-        destination_mac, source_mac, ethernet_protocol, data = ethernet_frame(raw_data)
-
+        destination_mac, source_mac, ethernet_protocol, data = format_ethernet_frame(raw_data)
+ 
         Ethernet_Frame = collections.namedtuple('Ethernet_Frame', ['destination_mac', 'source_mac', 'ethernet_protocol'])
-        ethernet_frame = Ethernet_Frame(destination_mac, source_mac, ethernet_protocol)
+        ethernet_frame = Ethernet_Frame(destination_mac, source_mac, str(ethernet_protocol))
 
         #8 for IPv4
         if ethernet_protocol == 8:
             version, header_length, ttl, protocol, source, target, data = ipv4_packet(data)
 
             IPV4 = collections.namedtuple('IPV', ['version', 'header_length', 'ttl', 'protocol', 'source', 'target'])
-            ipv4 = IPV4(version, header_length, ttl, protocol, source, target)
+            ipv4 = IPV4(str(version), str(header_length), str(ttl), str(protocol), source, target)
 
             #ICMP
             if protocol == 1:
                 icmp_type, code, checksum, data = icmp_segment(data)
 
-                ICMP = collections.namedtuple('ICMP', ['tcmp_type', 'code', 'checksum', 'data'])
-                icmp = ICMP(icmp_type, code, checksum, data)
+                ICMP = collections.namedtuple('ICMP', ['icmp_type', 'code', 'checksum', 'data'])
+                icmp = ICMP(str(icmp_type), str(code), str(checksum), format_data(data))
 
                 Packet_ICMP = collections.namedtuple('Packet_ICMP', ['ethernet_frame', 'ipv4', 'icmp'])
                 packet_icmp = Packet_ICMP(ethernet_frame, ipv4, icmp)
@@ -49,7 +50,7 @@ def nids_sniffer():
 
                 TCP = collections.namedtuple('TCP', ['source_port', 'destination_port', 'sequence', 'acknowledgment', 'flag_urg', 'flag_ack', 'flag_psh', 'flag_rst', 
                     'flag_syn', 'flag_fin', 'data'])
-                tcp = TCP(source_port, destination_port, sequence, acknowledgment, flag_urg, flag_ack, flag_psh, flag_rst, flag_syn, flag_fin, data)
+                tcp = TCP(str(source_port), str(destination_port), str(sequence), str(acknowledgment), str(flag_urg), str(flag_ack), str(flag_psh), str(flag_rst), str(flag_syn), str(flag_fin), format_data(data))
 
                 Packet_TCP = collections.namedtuple('Packet_TCP', ['ethernet_frame', 'ipv4', 'tcp'])
                 packet_tcp = Packet_TCP(ethernet_frame, ipv4, tcp)
@@ -61,7 +62,7 @@ def nids_sniffer():
                 source_port, destination_port, length, data = udp_segment(data)
 
                 UDP = collections.namedtuple('UDP', ['source_port', 'destination_port', 'length', 'data'])
-                udp = UDP(source_port, destination_port, length, data)
+                udp = UDP(str(source_port), str(destination_port), str(length), format_data(data))
 
                 Packet_UDP = collections.namedtuple('Packet_UDP', ['ethernet_frame', 'ipv4', 'udp'])
                 packet_udp = Packet_UDP(ethernet_frame, ipv4, udp)
@@ -70,7 +71,7 @@ def nids_sniffer():
                 
             else:
                 Packet_Other = collections.namedtuple('Packet_Other', ['ethernet_frame', 'ipv4', 'other'])
-                packet_other = Packet_Other(ethernet_frame, ipv4)
+                packet_other = Packet_Other(ethernet_frame, ipv4, format_data(data))
 
                 scan_packet(packet_other)
 
@@ -82,10 +83,13 @@ def packet_sniffer():
 
     while True:
         raw_data, addr = conn.recvfrom(65536)
-        destination_mac, source_mac, ethernet_protocol, data = ethernet_frame(raw_data)
-
+        destination_mac, source_mac, ethernet_protocol, data = format_ethernet_frame(raw_data)
+    
         output.write('\nEthernet Frame:')
-        output.write(TAB_1 + 'Destination: {}, Source: {}, Protocol: {}'.format(destination_mac, source_mac, ethernet_proto))
+        output.write(TAB_1 + 'Destination: {}, Source: {}, Protocol: {}'.format(destination_mac, source_mac, ethernet_protocol))
+
+        print('\nEthernet Frame:')
+        print(TAB_1 + 'Destination: {}, Source: {}, Protocol: {}'.format(destination_mac, source_mac, ethernet_protocol))
 
         #8 for IPv4
         if ethernet_protocol == 8:
@@ -95,6 +99,10 @@ def packet_sniffer():
             output.write(TAB_2 + 'Version: {}, Header Length: {}, TTL: {}'.format(version, header_length, ttl))
             output.write(TAB_2 + 'Protocol: {}, Source, {}, Target: {}'.format(protocol, source, target))
 
+            print(TAB_1 + 'IPv4 Packet:')
+            print(TAB_2 + 'Version: {}, Header Length: {}, TTL: {}'.format(version, header_length, ttl))
+            print(TAB_2 + 'Protocol: {}, Source, {}, Target: {}'.format(protocol, source, target))
+
             #ICMP
             if protocol == 1:
                 icmp_type, code, checksum, data = icmp_segment(data)
@@ -103,6 +111,11 @@ def packet_sniffer():
                 output.write(TAB_2 + 'Type: {}, Code: {}, Checksum: {},'.format(icmp_type, code, checksum))
                 output.write(TAB_2 + 'Data:')
                 output.write(format_multi_line(DATA_TAB_3, data))
+
+                print(TAB_1 + 'ICMP Packet:')
+                print(TAB_2 + 'Type: {}, Code: {}, Checksum: {},'.format(icmp_type, code, checksum))
+                print(TAB_2 + 'Data:')
+                print(format_multi_line(DATA_TAB_3, data))
 
             #TCP
             elif protocol == 6:
@@ -116,6 +129,14 @@ def packet_sniffer():
                 output.write(TAB_2 + 'Data:')
                 output.write(format_multi_line(DATA_TAB_3, data))
 
+                print(TAB_1 + 'TCP Segment:')
+                print(TAB_2 + 'Source Port: {}, Destination Port: {}'.format(source_port, destination_port))
+                print(TAB_2 + 'Sequence: {}, Acknowledgement: {}'.format(sequence, acknowledgment))
+                print(TAB_2 + 'Flags:')
+                print(TAB_3 + 'URG: {}, ACK: {}, PSH: {}, RST: {}, SYN: {}, FIN: {}'.format(flag_urg, flag_ack, flag_psh, flag_rst, flag_syn, flag_fin))
+                print(TAB_2 + 'Data:')
+                print(format_multi_line(DATA_TAB_3, data))
+
             #UDP
             elif protocol == 17:
                 source_port, destination_port, length, data = udp_segment(data)
@@ -125,13 +146,21 @@ def packet_sniffer():
                 output.write(TAB_2 + 'Data:')
                 output.write(format_multi_line(DATA_TAB_3, data))
 
+                print(TAB_1 + 'UDP Segment:')
+                print(TAB_2 + 'Source Port: {}, Destination Port: {}, Length: {}'.format(source_port, destination_port, length))
+                print(TAB_2 + 'Data:')
+                print(format_multi_line(DATA_TAB_3, data))
+
             else:
                 output.write(TAB_1 + 'Data:')
                 output.write(format_multi_line(DATA_TAB_2, data))
 
+                print(TAB_1 + 'Data:')
+                print(format_multi_line(DATA_TAB_2, data))
+
 
 #Unpack ethernet frame
-def ethernet_frame(data):
+def format_ethernet_frame(data):
     destination_mac, source_mac, protocol = struct.unpack('! 6s 6s H', data[:14])
     return get_mac_addr(destination_mac), get_mac_addr(source_mac), socket.htons(protocol), data[14:]
 
@@ -146,10 +175,10 @@ def ipv4_packet(data):
     version = version_header_length >> 4
     header_length = (version_header_length & 15) * 4
     ttl, protocol, source, target = struct.unpack('! 8x B B 2x 4s 4s', data[:20])
-    return version, header_length, ttl, protocol, ipv4(source), ipv4(target), data[header_length:]
+    return version, header_length, ttl, protocol, format_ipv4(source), format_ipv4(target), data[header_length:]
 
 #Returns properly formatted IPv4 address
-def ipv4(addr):
+def format_ipv4(addr):
     return '.'.join(map(str, addr))
 
 #Unpacks ICMP packet
@@ -167,12 +196,12 @@ def tcp_segment(data):
     flag_rst = (offset_reserved_flags & 4) >> 2
     flag_syn = (offset_reserved_flags & 2) >> 1
     flag_fin = offset_reserved_flags & 1
-    return src_port, dest_port, sequence, acknowledgement, flag_urg, flag_ack, flag_psh, flag_rst, flag_syn, flag_fin, data[offset:]
+    return source_port, destination_port, sequence, acknowledgement, flag_urg, flag_ack, flag_psh, flag_rst, flag_syn, flag_fin, data[offset:]
 
 #Unpacks UDP segment
 def udp_segment(data):
     source_port, destination_port, size = struct.unpack('! H H 2x H', data[:8])
-    return src_port, dest_port, size, data[8:]
+    return source_port, destination_port, size, data[8:]
 
 #Formats multi-line data
 def format_multi_line(prefix, string, size = 80):
@@ -182,3 +211,8 @@ def format_multi_line(prefix, string, size = 80):
         if size % 2:
             size -=1
     return '\n'.join([prefix + line for line in textwrap.wrap(string, size)])
+
+def format_data(string):
+    if isinstance(string, bytes):
+        string = ''.join(r'\x{:02x}'.format(byte) for byte in string)
+    return string

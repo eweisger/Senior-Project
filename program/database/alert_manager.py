@@ -14,20 +14,20 @@ def alert_manager(user_input):
 
 
 def alert_add(alert):
-    with open("alerts.txt", "a") as alerts:
+    with open("database/alerts.txt", "a") as alerts:
         alerts.write(alert + "\n")
 
 
 def alert_clear():
-    with open("alerts.txt", "w+") as alerts:
+    with open("database/alerts.txt", "w+") as alerts:
         alerts.truncate()
 
 
 def alert_print():
     print("Alerts")
     print("------")
-    if os.stat("alerts.txt").st_size != 1:
-        with open("alerts.txt", "r") as alerts:
+    if os.stat("database/alerts.txt").st_size != 1:
+        with open("database/alerts.txt", "r") as alerts:
             for line in alerts:
                 parsed_line = line.strip()
                 parsed_line = parsed_line.split(" ||| ")
