@@ -25,9 +25,10 @@ def sig_manager(user_input):
 
     return False
 
+
 def sig_check(user_input):
     if len(user_input) == 0:
-        print("A signautre, name, or CVE is required")
+        print("A signautre, name, or CVE is required\n")
         return
 
     if user_input[0].casefold() == "-n":
@@ -35,15 +36,23 @@ def sig_check(user_input):
         name = " ".join(user_input)
         name = format_name(name)
         if name[0] == False:
-            print("The input {} is not a proper name".format(name[1]))
-            print("Names cannot begin with a space or contain a \"|\"")
+            print("The input \"{}\" is not a proper name".format(name[1]))
+            print("Names cannot begin with a space or contain a \"|\"\n")
             return
 
-        if check_name(name) == True:
-            print("The name {} is in the signature list".format(name))
-            return
+        #Check if file is empty to avoid index out of bounds error
+        if os.stat("database/signatures.txt").st_size != 1:
+            with open("database/signatures.txt", "r") as signatures:
+                for line in signatures:
+                    parsed_line = line.strip()
+                    parsed_line = parsed_line.split(" | ")
+                    if name == parsed_line[0]:
+                        print("The name, {}, is in the signature list".format(name))
+                        print("Name: {}   Platform: {}   Service: {}   Rank: {}   Disclosed: {}   CVE: {}\nSignature: {}\n".format(parsed_line[0],
+                            parsed_line[1], parsed_line[2], parsed_line[3], parsed_line[4], parsed_line[5], parsed_line[6]))
+                        return
 
-        print("The name {} is not in the signature list".format(name))
+        print("The name, {}, is not in the signature list\n".format(name))
         return
 
     if user_input[0].casefold() == "-c":
@@ -51,34 +60,50 @@ def sig_check(user_input):
         cve = " ".join(user_input)
         cve = format_cve(cve)
         if cve[0] == False:
-            print("The input {} is not a proper CVE".format(cve[1]))
-            print("CVEs must be in the format cve-yyyy-nnnn with at least 4 digits in the sequence number portion of the id")
+            print("The input \"{}\" is not a proper CVE".format(cve[1]))
+            print("CVEs must be in the format cve-yyyy-nnnn with at least 4 digits in the sequence number portion of the id\n")
             return
+    
+        #check if file is empty to avoid index out of bounds error
+        if os.stat("database/signatures.txt").st_size != 1:
+            with open("database/signatures.txt", "r") as signatures:
+                for line in signatures:
+                    parsed_line = line.strip()
+                    parsed_line = parsed_line.split(" | ")
+                    if cve == parsed_line[5]:
+                        print("The CVE, {}, is in the signature list".format(cve))
+                        print("Name: {}   Platform: {}   Service: {}   Rank: {}   Disclosed: {}   CVE: {}\nSignature: {}\n".format(parsed_line[0],
+                            parsed_line[1], parsed_line[2], parsed_line[3], parsed_line[4], parsed_line[5], parsed_line[6]))
+                        return
 
-        if check_cve(cve) == True:
-            print("The CVE {} is in the signature list".format(cve))
-            return
-
-        print("The CVE {} is not in the signature list".format(cve))
+        print("The CVE, {}, is not in the signature list\n".format(cve))
         return
 
     signature = " ".join(user_input)
     signature = format_sig(signature)
     if signature[0] == False:
-        print("The input {} is not a proper signature".format(signature[1]))
-        print("Signatures must be in the format \\xnn where n is a-f or 0-9")
+        print("The input \"{}\" is not a proper signature".format(signature[1]))
+        print("Signatures must be in the format \\xnn where n is a-f or 0-9\n")
         return
+       
+    #Check if file is empty to avoid index out of bounds error
+    if os.stat("database/signatures.txt").st_size != 1:
+        with open("database/signatures.txt", "r") as signatures:
+            for line in signatures:
+                parsed_line = line.strip()
+                parsed_line = parsed_line.split(" | ")
+                if signature == parsed_line[6]:
+                    print("The signature is in the signature list")
+                    print("Name: {}   Platform: {}   Service: {}   Rank: {}   Disclosed: {}   CVE: {}\nSignature: {}\n".format(parsed_line[0],
+                        parsed_line[1], parsed_line[2], parsed_line[3], parsed_line[4], parsed_line[5], parsed_line[6]))
+                    return
 
-    if check_sig(signature) == True:
-        print("The signature {} is in the signature list".format(signature))
-        return
-
-    print("The signature {} is not in the signature list".format(signature))
+    print("The signature is not in the signature list\n".format(signature))
 
 
 def sig_add(user_input):
     if len(user_input) == 0:
-        print("A signature and name are required")
+        print("A signature and name are required\n")
         return 
 
     signature = ""
@@ -90,19 +115,19 @@ def sig_add(user_input):
     
     signature = format_sig(signature)
     if signature[0] == False:
-        print("The input {} is not a proper signature".format(signature[1]))
-        print("Signatures must be in the format \\xnn where n is a-f or 0-9")
+        print("The input \"{}\" is not a proper signature".format(signature[1]))
+        print("Signatures must be in the format \\xnn where n is a-f or 0-9\n")
         return
 
     if check_sig(signature) == True:
-        print("The signature {} is already in the signature list".format(signature))
+        print("The signature is already in the signature list\n".format(signature))
         return
 
     name = platform = service = rank = disclosed = cve = ""
     while len(user_input) != 0:
         if user_input[0].casefold() == "-n":
             if name != "":
-                print("You can only have one name")
+                print("You can only have one name\n")
                 return
 
             user_input = user_input[1:]
@@ -114,17 +139,17 @@ def sig_add(user_input):
 
             name = format_name(name)
             if name[0] == False:
-                print("The input {} is not a proper name".format(name[1]))
-                print("Names cannot begin with a space or contain a \"|\"")
+                print("The input \"{}\" is not a proper name".format(name[1]))
+                print("Names cannot begin with a space or contain a \"|\"\n")
                 return
 
             if check_name(name) == True:
-                print("The name {} is already in the signature list".format(name))
+                print("The name, {}, is already in the signature list\n".format(name))
                 return
 
         elif user_input[0].casefold() == "-p":
             if platform != "":
-                print("You can only have one platform")
+                print("You can only have one platform\n")
                 return 
 
             user_input = user_input[1:]
@@ -136,13 +161,13 @@ def sig_add(user_input):
             
             platform = format_platform(platform)
             if platform[0] == False:
-                print("The input {} is not a proper platform".format(platform[1]))
-                print("Platforms cannot begin with a space or contain a \"|\"")
+                print("The input \"{}\" is not a proper platform".format(platform[1]))
+                print("Platforms cannot begin with a space or contain a \"|\"\n")
                 return
 
         elif user_input[0].casefold() == "-s":
             if service != "":
-                print("You can only have one service")
+                print("You can only have one service\n")
                 return
 
             user_input = user_input[1:]
@@ -154,13 +179,13 @@ def sig_add(user_input):
 
             service = format_service(service)
             if service[0] == False:
-                print("The input {} is not a proper service".format(servic[1]))
-                print("Services cannot begin with a space or contain a \"|\"")
+                print("The input \"{}\" is not a proper service".format(servic[1]))
+                print("Services cannot begin with a space or contain a \"|\"\n")
                 return
 
         elif user_input[0].casefold() == "-r":
             if rank != "":
-                print("You can only have one rank")
+                print("You can only have one rank\n")
                 return
 
             user_input = user_input[1:]
@@ -172,13 +197,13 @@ def sig_add(user_input):
 
             rank = format_rank(rank)
             if rank[0] == False:
-                print("The input {} is not a proper rank".format(rank[1]))
-                print("Ranks cannot begin with a space or contain a \"|\"")
+                print("The input \"{}\" is not a proper rank".format(rank[1]))
+                print("Ranks cannot begin with a space or contain a \"|\"\n")
                 return
 
         elif user_input[0].casefold() == "-d":
             if disclosed != "":
-                print("You can only have one disclose date")
+                print("You can only have one disclose date\n")
                 return
 
             user_input = user_input[1:]
@@ -190,13 +215,13 @@ def sig_add(user_input):
 
             disclosed = format_disclosed(disclosed)
             if disclosed[0] == False:
-                print("The input {} is not a proper disclosure date".format(disclosed[1]))
-                print("Disclosure dates must be in the form yyyy-mm-dd or yyyy-mm")
+                print("The input \"{}\" is not a proper disclosure date".format(disclosed[1]))
+                print("Disclosure dates must be in the form yyyy-mm-dd or yyyy-mm\n")
                 return
 
         elif user_input[0].casefold() == "-c":
             if cve != "":
-                print("You can only have one CVE")
+                print("You can only have one CVE\n")
                 return
 
             user_input = user_input[1:]
@@ -208,16 +233,16 @@ def sig_add(user_input):
 
             cve = format_cve(cve)
             if cve[0] == False:
-                print("The input {} us not a proper CVE".format(cve[1]))
-                print("CVEs must be in the format cve-yyyy-nnnn with at least 4 digits in the sequence number portion of the id")
+                print("The input \"{}\" us not a proper CVE".format(cve[1]))
+                print("CVEs must be in the format cve-yyyy-nnnn with at least 4 digits in the sequence number portion of the id\n")
                 return
 
             if check_cve(cve) == True:
-                print("The CVE {} is already in the signature list".format(cve))
+                print("The CVE, {}, is already in the signature list\n".format(cve))
                 return
 
     if name == "":
-        print("The signature must have a unique name associated with it")
+        print("The signature must have a name associated with it\n")
         return
     if platform == "":
         platform = " "
@@ -236,7 +261,7 @@ def sig_add(user_input):
 
 def sig_remove(user_input):
     if len(user_input) == 0:
-        print("A signature, name, or cve is required")
+        print("A signature, name, or cve is required\n")
         return
 
     if user_input[0].casefold() == "-n":
@@ -244,8 +269,8 @@ def sig_remove(user_input):
         name = " ".join(user_input)
         name = format_name(name)
         if name[0] == False:
-            print("The input {} is not a proper name".format(name[1]))
-            print("Names cannot begin with a space or contain a \"|\"")
+            print("The input \"{}\" is not a proper name".format(name[1]))
+            print("Names cannot begin with a space or contain a \"|\"\n")
             return
 
         if check_name(name) == True:
@@ -263,7 +288,7 @@ def sig_remove(user_input):
                             signatures.write(line)
                     return
 
-        print("The name {} is not in the signature list".format(name))
+        print("The name, {}, is not in the signature list\n".format(name))
         return
 
     if user_input[0].casefold() == "-c":
@@ -271,8 +296,8 @@ def sig_remove(user_input):
         cve = " ".join(user_input)
         cve = format_cve(cve)
         if cve[0] == False:
-            print("The input {} is not a proper CVE".format(cve[1]))
-            print("CVEs must be in the format cve-yyyy-nnnn with at least 4 digits in the sequence number portion of the id")
+            print("The input \"{}\" is not a proper CVE".format(cve[1]))
+            print("CVEs must be in the format cve-yyyy-nnnn with at least 4 digits in the sequence number portion of the id\n")
             return
 
         if check_cve(cve) == True:
@@ -290,14 +315,14 @@ def sig_remove(user_input):
                             signatures.write(line)
                     return
 
-        print("The CVE {} is not in the signature list".format(cve))
+        print("The CVE, {}, is not in the signature list\n".format(cve))
         return
 
     signature = " ".join(user_input)
     signature = format_sig(signature)
     if signature[0] == False:
-        print("The input {} is not a proper signature".format(signature[1]))
-        print("Signatures must be in the format \\xnn where n is a-f or 0-9")
+        print("The input \"{}\" is not a proper signature".format(signature[1]))
+        print("Signatures must be in the format \\xnn where n is a-f or 0-9\n")
         return
 
     if check_sig(signature) == True:
@@ -315,7 +340,7 @@ def sig_remove(user_input):
                         signatures.write(line)
                 return
 
-    print("The signature {} is not in the signature list".format(signature))
+    print("The signature is not in the signature list\n".format(signature))
 
 
 def sig_print():
@@ -330,7 +355,7 @@ def sig_print():
                 parsed_line = parsed_line.split(" | ")
                 print("Name: {}   Platform: {}   Service: {}   Rank: {}   Disclosed: {}   CVE: {}\nSignature: {}".format(parsed_line[0], parsed_line[1],
                     parsed_line[2], parsed_line[3], parsed_line[4], parsed_line[5], parsed_line[6]))
-    print("\n")
+                print("---------------------------------\n")
 
 
 def check_sig(signature):

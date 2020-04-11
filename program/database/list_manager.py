@@ -42,21 +42,21 @@ def whitelist_check(ip):
 
 def whitelist_add(user_input):
     if len(user_input) == 0:
-        print("An IP address or domain name is required")
+        print("An IP address or domain name is required\n")
         return
 
     ip = check_ip_format(user_input)
     if ip[0] == False:
-        print("The input {} is not a proper IP address".format(ip[1]))
-        print("IP addresses must be in the form n.n.n.n.n where n can be 0-255")
+        print("The input \"{}\" is not a proper IP address".format(ip[1]))
+        print("IP addresses must be in the form n.n.n.n.n where n can be 0-255\n")
         return
 
     if blacklist_check(ip) == True:
-        print("The IP {} is already in blacklist".format(ip)) 
+        print("The IP address, {}, is already in blacklist\n".format(ip)) 
         return
 
     if whitelist_check(ip) == True:
-        print("The IP {} is already in whitelist".format(ip))
+        print("The IP address, {}, is already in whitelist\n".format(ip))
         return
 
     with open("database/whitelist.txt", "a") as whitelist:
@@ -84,21 +84,21 @@ def blacklist_check(ip):
 
 def blacklist_add(user_input):
     if len(user_input) == 0:
-        print("An IP address or domain name is required")
+        print("An IP address or domain name is required\n")
         return
 
     ip = check_ip_format(user_input)
     if ip[0] == False:
-        print("The input {} is not a proper IP address".format(ip[1]))
-        print("IP addresses must be in the form n.n.n.n.n where n can be 0-255")
+        print("The input \"{}\" is not a proper IP address".format(ip[1]))
+        print("IP addresses must be in the form n.n.n.n.n where n can be 0-255\n")
         return
 
     if blacklist_check(ip) == True:
-        print("The IP {} is already in blacklist".format(ip)) 
+        print("The IP address, {}, is already in blacklist\n".format(ip)) 
         return
 
     if whitelist_check(ip) == True:
-        print("The IP {} is already in whitelist".format(ip))
+        print("The IP address, {}, is already in whitelist\n".format(ip))
         return
 
     with open("database/blacklist.txt", "a") as blacklist:
@@ -118,35 +118,35 @@ def blacklist_print():
 
 def check_ip(user_input):
     if len(user_input) == 0:
-        print("An IP address or domain name is required")
+        print("An IP address or domain name is required\n")
         return
 
     ip = check_ip_format(user_input)
     if ip[0] == False:
-        print("The input {} is not a proper IP address".format(ip[1]))
-        print("IP addresses must be in the form n.n.n.n.n where n can be 0-255")
+        print("The input \"{}\" is not a proper IP address".format(ip[1]))
+        print("IP addresses must be in the form n.n.n.n.n where n can be 0-255\n")
         return
 
     if blacklist_check(ip) == True:
-        print("The IP {} is in the blacklist".format(ip))
+        print("The IP address, {}, is in the blacklist\n".format(ip))
         return
 
     if whitelist_check(ip) == True:
-        print("The IP {} is in the whitelist".format(ip))
+        print("The IP address, {}, is in the whitelist\n".format(ip))
         return
     
-    print("The IP {} is in neither the whitelist or blacklist".format(ip))
+    print("The IP address, {}, is in neither the whitelist or blacklist\n".format(ip))
 
 
 def remove_ip(user_input):
     if len(user_input) == 0:
-        print("An IP address or domain name is required")
+        print("An IP address or domain name is required\n")
         return
 
     ip = check_ip_format(user_input)
     if ip[0] == False:
-        print("The input {} is not a proper IP address".format(ip[1]))
-        print("IP addresses must be in the form n.n.n.n.n where n can be 0-255")
+        print("The input \"{}\" is not a proper IP address".format(ip[1]))
+        print("IP addresses must be in the form n.n.n.n.n where n can be 0-255\n")
         return
 
     if blacklist_check(ip) == True:
@@ -173,7 +173,7 @@ def remove_ip(user_input):
                         whitelist.write(line)
                 return
     
-    print("The IP {} is in neither the whitelist or the blacklist".format(ip))
+    print("The IP address, {}, is in neither the whitelist or the blacklist\n".format(ip))
 
 
 def check_ip_format(ip):
@@ -183,10 +183,3 @@ def check_ip_format(ip):
         return False, ip
 
     return ip
-
-def tests():
-    blacklist_add("1.1.1.1.1\n")
-    remove_ip("1.1.1.1.1\n")
-
-if __name__ == "__main__":
-    tests()

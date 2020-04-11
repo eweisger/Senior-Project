@@ -20,23 +20,27 @@ def scan_packet(packet):
                 if packet.ipv4.protocol == "1":
                     for index, value, in A.iter(packet.icmp.data):
                         values.append(value)
+                    values = list(dict.fromkeys(values))
                     print_and_store(packet, values, blacklisted)
                     return
 
                 if packet.ipv4.protocol == "6":
                     for index, value in A.iter(packet.tcp.data):
                         values.append(value)
+                    values = list(dict.fromkeys(values))
                     print_and_store(packet, values, blacklisted)
                     return
 
                 if packet.ipv4.protocol == "17":
                     for index, value in A.iter(packet.udp.data):
                         values.append(value)
+                    values = list(dict.fromkeys(values))
                     print_and_store(packet, values, blacklisted)
                     return
 
                 for index, value in A.iter(packet.data):
                     values.append(value)
+                values = list(dict.fromkeys(values))
                 print_and_store(packet, values, blacklisted)
                 return
 
@@ -55,6 +59,7 @@ def scan_packet(packet):
                 for index, value, in A.iter(packet.icmp.data.strip()):
                     values.append(value)
                 if len(values) != 0:
+                    values = list(dict.fromkeys(values))
                     print_and_store(packet, values, blacklisted)
                 return
 
@@ -62,6 +67,7 @@ def scan_packet(packet):
                 for index, value in A.iter(packet.tcp.data):
                     values.append(value)
                 if len(values) != 0:
+                    values = list(dict.fromkeys(values))
                     print_and_store(packet, values, blacklisted)
                 return
 
@@ -69,12 +75,14 @@ def scan_packet(packet):
                 for index, value in A.iter(packet.udp.data):
                     values.append(value)
                 if len(values) != 0:
+                    values = list(dict.fromkeys(values))
                     print_and_store(packet, values, blacklisted)
                 return
 
             for index, value in A.iter(packet.data):
                 values.append(value)
             if len(values) != 0:
+                values = list(dict.fromkeys(values))
                 print_and_store(packet, values, blacklisted)
             return
 

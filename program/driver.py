@@ -39,6 +39,9 @@ def command_prompt():
         elif alert_manager(user_input) == True:
             pass
 
+        else:
+            print("The input \"{}\" is not a command\n".format(user_input))
+
 
 def welcome_message():
     with open("welcome_image.txt") as image:
