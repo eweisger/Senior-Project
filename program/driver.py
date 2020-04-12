@@ -1,8 +1,17 @@
+import subprocess
+import multiprocessing
+import os
+import sys
+from signal import signal, SIGINT, SIGTERM
+
 from sensor.sniffer import nids_sniffer, packet_sniffer
 from detector.detector import build_signature_database
 from database.list_manager import list_manager
 from database.alert_manager import alert_manager
 from database.sig_manager import sig_manager
+from database.sniffer_manager import sniffer_manager
+
+pid = None
 
 def command_prompt():
     welcome_message()
@@ -16,6 +25,8 @@ def command_prompt():
     w.close()
     b = open("database/blacklist.txt", "a")
     b.close()
+    c = open("database/sniffer_output.txt", "a")
+    c.close()
     
     user_input = ""
     while user_input.casefold() != "exit":
@@ -39,6 +50,9 @@ def command_prompt():
         elif alert_manager(user_input) == True:
             pass
 
+        elif sniffer_manager(user_input) == True:
+            pass
+
         else:
             print("The input \"{}\" is not a command\n".format(user_input))
 
@@ -55,13 +69,17 @@ def welcome_message():
 
 
 def run_sniffer():
+    global pid
     print("Running Packet Sniffer")
     print("----------------------")
-    print("Type \"stop\" to stop the sniffer and exit back to the command prompt\n")
-    packet_sniffer()
+    print("Hit enter to stop the sniffer and exit back to the command prompt\n")
+    sniffer_process = multiprocessing.Process(target = packet_sniffer)
+    sniffer_process.start()
+    pid = sniffer_process.pid
 
 
 def run_NIDS():
+    subprocess.call(["ufw", "enable"])
     print("Building Signature Database...")
     build_signature_database()
     print("Running Network Intrusion Detection System")
@@ -81,6 +99,8 @@ def help():
                          "\n\t\t\t    \"stop\" will stop the the network intrusion detection system")
     print("   printalerts \t\t print recorded alerts")
     print("   clearalerts \t\t clears all recorded alerts")
+    print("   printsniffer \t\t print recorded packet sniffer output")
+    print("   clearsniffer \t\t clear all recorded packet sniffer")
     print("   exit \t\t quits the program")
 
     print("")
@@ -91,7 +111,8 @@ def help():
         "Those in the blacklist always generate an alert, meaning they are always reported and still scanned\n")
     print("   checkip ip \t\t checks if ip is in whitelist or blacklist")
     print("   addwhite ip \t\t adds ip to whitelist")
-    print("   addblack ip \t\t adds ip to blacklist")
+    print("   addblack ip \t\t adds ip to blacklist" +
+                        "\n\t\t\t     Optional flag \"-re response\" specifies response")
     print("   removeip ip \t\t removes ip from whitelist or blacklist")
     print("   printblack \t\t prints the current blacklist")
     print("   printwhite \t\t prints the current whitelist")
@@ -111,14 +132,25 @@ def help():
                          "\n\t\t\t    Flag \"-n name\" adds name" +
                          "\n\t\t\t    Optional flag \"-p platform\" adds platform" +
                          "\n\t\t\t    Optional flag \"-s service\" adds service" +
-                         "\n\t\t\t    Optional flag \"-r rank\" adds rank" +
+                         "\n\t\t\t    Optional flag \"-ra rank\" adds rank" +
                          "\n\t\t\t    Optional flag \"-d date\" adds date" +
-                         "\n\t\t\t    Optional flag \"-c cve\" adds CVE")
+                         "\n\t\t\t    Optional flag \"-c cve\" adds CVE" +
+                         "\n\t\t\t    Optional flag \"-re respone\" specifies response")
     print("   removesig signature \t removes signature from the database" +
                         "\n\t\t\t    \"removesig -n name\" removes signature by name" +
                         "\n\t\t\t    \"removesig -c cve\" removes signature by CVE")
     print("   printsigs \t\t prints the signature database\n")
 
 
+def handler(signal_recieved, frame):
+    global pid
+    if pid != None:
+        os.kill(pid, signal.SIGTERM)
+        pid = None
+    else:
+        exit(0)
+
+
 if __name__ == '__main__':
+    signal(SIGINT, handler)
     command_prompt()

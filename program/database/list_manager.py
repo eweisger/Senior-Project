@@ -13,19 +13,26 @@ def list_manager(user_input):
     user_input = user_input.split()
 
     if user_input[0].casefold() == "checkip":
-        check_ip(user_input[1])
+        user_input = user_input[1:]
+        user_input = " ".join(user_input)
+        check_ip(user_input)
         return True
 
     if user_input[0].casefold() == "addwhite":
-        whitelist_add(user_input[1])
+        user_input = user_input[1:]
+        user_input = " ".join(user_input)
+        whitelist_add(user_input)
         return True
 
     if user_input[0].casefold() == "addblack":
-        blacklist_add(user_input[1])
+        user_input = user_input[1:]
+        blacklist_add(user_input)
         return True
 
     if user_input[0].casefold() == "removeip":
-        remove_ip(user_input[1])
+        user_input = user_input[1:]
+        user_input = " ".join(user_input)
+        remove_ip(user_input)
         return True
 
     return False
@@ -77,7 +84,9 @@ def blacklist_check(ip):
     if os.stat("database/blacklist.txt").st_size != 1:
         with open("database/blacklist.txt", "r") as blacklist:
             for line in blacklist:
-                if ip == line.strip():
+                parsed_line = line.strip()
+                parsed_line = parsed_line.split(" | ")
+                if ip == parsed_line[0]:
                     return True
     return False
 
@@ -87,7 +96,14 @@ def blacklist_add(user_input):
         print("An IP address or domain name is required\n")
         return
 
-    ip = check_ip_format(user_input)
+    ip = ""
+    for string in user_input:
+        if string == "-re":
+            break
+        ip = ip + " " + string
+        user_input = user_input[1:]
+
+    ip = check_ip_format(ip)
     if ip[0] == False:
         print("The input \"{}\" is not a proper IP address".format(ip[1]))
         print("IP addresses must be in the form n.n.n.n.n where n can be 0-255\n")
@@ -102,8 +118,26 @@ def blacklist_add(user_input):
         return
 
     with open("database/blacklist.txt", "a") as blacklist:
-        blacklist.write(ip + "\n")
+        if len(user_input) == 0:
+            blacklist.write(ip + " | " + "none" + "\n")
+            return
+        
+        response = ""
+        user_input = user_input[1:]
+        for string in user_input:
+            if string == "-re":
+                print("You can only have one response\n")
+                return
+            response = response + " " + string
+            user_input = user_input[1:]
 
+        response = format_response(response)
+        if response[0] == False:
+            print("The input \"{}\" is not a proper response".format(response[1]))
+            print("Responses must be \"none\" or in the format \"block h:m:s\", where h the number of hours, m is the number of minutes, and s is the number of seconds")
+            return
+
+        blacklist.write(ip + " | " + response + "\n")
 
 def blacklist_print():
     print("Blacklist")
@@ -111,7 +145,9 @@ def blacklist_print():
     if os.stat("database/blacklist.txt").st_size != 1:
         with open("database/blacklist.txt", "r") as blacklist:
             for line in blacklist:
-                print(line.strip())
+                parsed_line = line.strip()
+                parsed_line = parsed_line.split(" | ")
+                print("{}   Response: {}".format(parsed_line[0], parsed_line[1]))
     
     print("\n")
 
@@ -127,9 +163,15 @@ def check_ip(user_input):
         print("IP addresses must be in the form n.n.n.n.n where n can be 0-255\n")
         return
 
-    if blacklist_check(ip) == True:
-        print("The IP address, {}, is in the blacklist\n".format(ip))
-        return
+    if os.stat("database/blacklist.txt").st_size != 1:
+        with open("database/blacklist.txt", "r") as blacklist:
+            for line in blacklist:
+                parsed_line = line.strip()
+                parsed_line = parsed_line.split(" | ")
+                if ip == parsed_line[0]:
+                    print("The IP address, {}, is in the blacklist".format(ip))
+                    print("{}   Response: {}\n".format(parsed_line[0], parsed_line[1]))
+                    return
 
     if whitelist_check(ip) == True:
         print("The IP address, {}, is in the whitelist\n".format(ip))
@@ -157,7 +199,9 @@ def remove_ip(user_input):
                 blacklist.truncate()
 
                 for line in lines:
-                    if line.strip() != ip:
+                    parsed_line = line.strip()
+                    parsed_line = parsed_line.split(" | ")
+                    if parsed_line[0] != ip:
                         blacklist.write(line)
                 return
 
@@ -183,3 +227,13 @@ def check_ip_format(ip):
         return False, ip
 
     return ip
+
+def format_response(response):
+    response = response.strip()
+    response = response.casefold()
+    re_response = re.compile("^(none)|(block (([1-9][0-9][0-9])|([1-9][0-9])|([0-9])):(([1-9][0-9][0-9])|([1-9][0-9])|([0-9])):(([1-9][0-9][0-9])|([1-9][0-9])|([0-9])))$")
+    if re_response.match(response) == None:
+        return False, response
+
+    return response
+

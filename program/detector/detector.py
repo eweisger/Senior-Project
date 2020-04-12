@@ -2,14 +2,14 @@ import ahocorasick
 import collections
 import pickle
 import os
-from actions.response import print_and_store
+from actions.response import determine_response
 
 def scan_packet(packet):
     if check_whitelist(packet.ipv4.source) == True:
         return
 
-    if check_blacklist(packet.ipv4.source) == True:
-        blacklisted = "Yes"
+    blacklist_response = check_blacklist(packet.ipv4.source)
+    if blacklist_response != False:
 
         with open('detector/automaton', 'rb') as pickled:
             A = pickle.load(pickled)
@@ -21,33 +21,32 @@ def scan_packet(packet):
                     for index, value, in A.iter(packet.icmp.data):
                         values.append(value)
                     values = list(dict.fromkeys(values))
-                    print_and_store(packet, values, blacklisted)
+                    determine_response(packet, values, "yes", blacklist_response)
                     return
 
                 if packet.ipv4.protocol == "6":
                     for index, value in A.iter(packet.tcp.data):
                         values.append(value)
                     values = list(dict.fromkeys(values))
-                    print_and_store(packet, values, blacklisted)
+                    determine_response(packet, values, "yes", blacklist_response)
                     return
 
                 if packet.ipv4.protocol == "17":
                     for index, value in A.iter(packet.udp.data):
                         values.append(value)
                     values = list(dict.fromkeys(values))
-                    print_and_store(packet, values, blacklisted)
+                    determine_response(packet, values, "yes", blacklist_response)
                     return
 
                 for index, value in A.iter(packet.data):
                     values.append(value)
                 values = list(dict.fromkeys(values))
-                print_and_store(packet, values, blacklisted)
+                determine_response(packet, values, "yes", blacklist_response)
                 return
 
-            print_and_store(packet, values, blacklisted)
+            determine_response(packet, values, blacklisted, blacklist_response)
             return
 
-    blacklisted = "No"
     with open('detector/automaton', 'rb') as pickled:
         A = pickle.load(pickled)
 
@@ -60,7 +59,7 @@ def scan_packet(packet):
                     values.append(value)
                 if len(values) != 0:
                     values = list(dict.fromkeys(values))
-                    print_and_store(packet, values, blacklisted)
+                    determine_response(packet, values, "no", "none")
                 return
 
             if packet.ipv4.protocol == "6":
@@ -68,7 +67,7 @@ def scan_packet(packet):
                     values.append(value)
                 if len(values) != 0:
                     values = list(dict.fromkeys(values))
-                    print_and_store(packet, values, blacklisted)
+                    determine_response(packet, values, "no", "none")
                 return
 
             if packet.ipv4.protocol == "17":
@@ -76,14 +75,14 @@ def scan_packet(packet):
                     values.append(value)
                 if len(values) != 0:
                     values = list(dict.fromkeys(values))
-                    print_and_store(packet, values, blacklisted)
+                    determine_response(packet, values, "no", "none")
                 return
 
             for index, value in A.iter(packet.data):
                 values.append(value)
             if len(values) != 0:
                 values = list(dict.fromkeys(values))
-                print_and_store(packet, values, blacklisted)
+                determine_response(packet, values, "no", "none")
             return
 
 
@@ -91,8 +90,10 @@ def check_blacklist(ip):
     if os.stat("database/blacklist.txt").st_size != 1:
         with open('database/blacklist.txt', 'r') as blacklist:
             for line in blacklist:
-                if ip == line.strip():
-                    return True
+                parsed_line = line.strip()
+                parsed_line = line.split(" | ")
+                if ip == parsed_line[0]:
+                    return parsed_line[1]
     return False
 
 
@@ -112,9 +113,8 @@ def build_signature_database():
         for index, line in enumerate(signature_list):
             parsed_line = line.strip()
             parsed_line = parsed_line.split(" | ")
-            A.add_word(parsed_line[6], index)
+            A.add_word(parsed_line[7], index)
     
     A.make_automaton()
     with open('detector/automaton', 'wb') as automaton:
         pickle.dump(A, automaton)
-

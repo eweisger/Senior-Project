@@ -48,8 +48,8 @@ def sig_check(user_input):
                     parsed_line = parsed_line.split(" | ")
                     if name == parsed_line[0]:
                         print("The name, {}, is in the signature list".format(name))
-                        print("Name: {}   Platform: {}   Service: {}   Rank: {}   Disclosed: {}   CVE: {}\nSignature: {}\n".format(parsed_line[0],
-                            parsed_line[1], parsed_line[2], parsed_line[3], parsed_line[4], parsed_line[5], parsed_line[6]))
+                        print("Name: {}   Platform: {}   Service: {}   Rank: {}   Disclosed: {}   CVE: {}   Response: {}\nSignature: {}\n".format(parsed_line[0],
+                            parsed_line[1], parsed_line[2], parsed_line[3], parsed_line[4], parsed_line[5], parsed_line[6], parsed_line[7]))
                         return
 
         print("The name, {}, is not in the signature list\n".format(name))
@@ -72,8 +72,8 @@ def sig_check(user_input):
                     parsed_line = parsed_line.split(" | ")
                     if cve == parsed_line[5]:
                         print("The CVE, {}, is in the signature list".format(cve))
-                        print("Name: {}   Platform: {}   Service: {}   Rank: {}   Disclosed: {}   CVE: {}\nSignature: {}\n".format(parsed_line[0],
-                            parsed_line[1], parsed_line[2], parsed_line[3], parsed_line[4], parsed_line[5], parsed_line[6]))
+                        print("Name: {}   Platform: {}   Service: {}   Rank: {}   Disclosed: {}   CVE: {}   Response: {}\nSignature: {}\n".format(parsed_line[0],
+                            parsed_line[1], parsed_line[2], parsed_line[3], parsed_line[4], parsed_line[5], parsed_line[6], parsed_line[7]))
                         return
 
         print("The CVE, {}, is not in the signature list\n".format(cve))
@@ -92,10 +92,10 @@ def sig_check(user_input):
             for line in signatures:
                 parsed_line = line.strip()
                 parsed_line = parsed_line.split(" | ")
-                if signature == parsed_line[6]:
+                if signature == parsed_line[7]:
                     print("The signature is in the signature list")
-                    print("Name: {}   Platform: {}   Service: {}   Rank: {}   Disclosed: {}   CVE: {}\nSignature: {}\n".format(parsed_line[0],
-                        parsed_line[1], parsed_line[2], parsed_line[3], parsed_line[4], parsed_line[5], parsed_line[6]))
+                    print("Name: {}   Platform: {}   Service: {}   Rank: {}   Disclosed: {}   CVE: {}   Response: {}\nSignature: {}\n".format(parsed_line[0],
+                        parsed_line[1], parsed_line[2], parsed_line[3], parsed_line[4], parsed_line[5], parsed_line[6], parsed_line[7]))
                     return
 
     print("The signature is not in the signature list\n".format(signature))
@@ -108,7 +108,7 @@ def sig_add(user_input):
 
     signature = ""
     for string in user_input:
-        if (string == "-n") or (string == "-p") or (string == "-s") or (string == "-r") or (string == "-d") or (string == "-c"):
+        if (string == "-n") or (string == "-p") or (string == "-s") or (string == "-ra") or (string == "-d") or (string == "-c") or (string == "-re"):
             break
         signature = signature + " " + string
         user_input = user_input[1:]
@@ -123,7 +123,7 @@ def sig_add(user_input):
         print("The signature is already in the signature list\n".format(signature))
         return
 
-    name = platform = service = rank = disclosed = cve = ""
+    name = platform = service = rank = disclosed = cve = response = ""
     while len(user_input) != 0:
         if user_input[0].casefold() == "-n":
             if name != "":
@@ -132,7 +132,7 @@ def sig_add(user_input):
 
             user_input = user_input[1:]
             for string in user_input:
-                if (string == "-n") or (string == "-p") or (string == "-s") or (string == "-r") or (string == "-d") or (string == "-c"):
+                if (string == "-n") or (string == "-p") or (string == "-s") or (string == "-ra") or (string == "-d") or (string == "-c") or (string == "-re"):
                     break
                 name = name + " " + string
                 user_input = user_input[1:]
@@ -154,7 +154,7 @@ def sig_add(user_input):
 
             user_input = user_input[1:]
             for string in user_input:
-                if (string == "-n") or (string == "-p") or (string == "-s") or (string == "-r") or (string == "-d") or (string == "-c"):
+                if (string == "-n") or (string == "-p") or (string == "-s") or (string == "-ra") or (string == "-d") or (string == "-c") or (string == "-re"):
                     break
                 platform = platform + " " + string
                 user_input = user_input[1:]
@@ -172,25 +172,25 @@ def sig_add(user_input):
 
             user_input = user_input[1:]
             for string in user_input:
-                if (string == "-n") or (string == "-p") or (string == "-s") or (string == "-r") or (string == "-d") or (string == "-c"):
+                if (string == "-n") or (string == "-p") or (string == "-s") or (string == "-ra") or (string == "-d") or (string == "-c") or (string == "-re"):
                     break
                 service = service + " " + string
                 user_input = user_input[1:]
 
             service = format_service(service)
             if service[0] == False:
-                print("The input \"{}\" is not a proper service".format(servic[1]))
+                print("The input \"{}\" is not a proper service".format(service[1]))
                 print("Services cannot begin with a space or contain a \"|\"\n")
                 return
 
-        elif user_input[0].casefold() == "-r":
+        elif user_input[0].casefold() == "-ra":
             if rank != "":
                 print("You can only have one rank\n")
                 return
 
             user_input = user_input[1:]
             for string in user_input:
-                if (string == "-n") or (string == "-p") or (string == "-s") or (string == "-r") or (string == "-d") or (string == "-c"):
+                if (string == "-n") or (string == "-p") or (string == "-s") or (string == "-ra") or (string == "-d") or (string == "-c") or (string == "-re"):
                     break
                 rank = rank + " " + string
                 user_input = user_input[1:]
@@ -208,7 +208,7 @@ def sig_add(user_input):
 
             user_input = user_input[1:]
             for string in user_input:
-                if (string == "-n") or (string == "-p") or (string == "-s") or (string == "-r") or (string == "-d") or (string == "-c"):
+                if (string == "-n") or (string == "-p") or (string == "-s") or (string == "-ra") or (string == "-d") or (string == "-c") or (string == "-re"):
                     break
                 disclosed = disclosed + " " + string
                 user_input = user_input[1:]
@@ -226,19 +226,37 @@ def sig_add(user_input):
 
             user_input = user_input[1:]
             for string in user_input:
-                if (string == "-n") or (string == "-p") or (string == "-s") or (string == "-r") or (string == "-d") or (string == "-c"):
+                if (string == "-n") or (string == "-p") or (string == "-s") or (string == "-ra") or (string == "-d") or (string == "-c") or (string == "-re"):
                     break
                 cve = cve + " " + string
                 user_input = user_input[1:]
 
             cve = format_cve(cve)
             if cve[0] == False:
-                print("The input \"{}\" us not a proper CVE".format(cve[1]))
+                print("The input \"{}\" is not a proper CVE".format(cve[1]))
                 print("CVEs must be in the format cve-yyyy-nnnn with at least 4 digits in the sequence number portion of the id\n")
                 return
 
             if check_cve(cve) == True:
                 print("The CVE, {}, is already in the signature list\n".format(cve))
+                return
+
+        elif user_input[0].casefold() == "-re":
+            if response != "":
+                print("You can only have one response\n")
+                return
+
+            user_input = user_input[1:]
+            for string in user_input:
+                if (string == "-n") or (string == "-p") or (string == "-s") or (string == "-ra") or (string == "-d") or (string == "-c") or (string == "-re"):
+                    break
+                response = response + " " + string
+                user_input = user_input[1:]
+
+            response = format_response(response)
+            if response[0] == False:
+                print("The input \"{}\" is not a proper resonse".format(response[1]))
+                print("Responses must be \"none\" or in the format \"block h:m:s\", where h is the number of hours, m is the number of minutes, and s is the number of seconds")
                 return
 
     if name == "":
@@ -254,9 +272,11 @@ def sig_add(user_input):
         disclosed = " "
     if cve == "":
         cve = " "
+    if response == "":
+        response = "none"
 
     with open("database/signatures.txt", "a") as signatures:
-        signatures.write(name + " | " + platform + " | " + service + " | " + rank + " | " + disclosed + " | " + cve + " | " + signature + "\n")
+        signatures.write(name + " | " + platform + " | " + service + " | " + rank + " | " + disclosed + " | " + cve + " | " + response + " | " + signature + "\n")
 
 
 def sig_remove(user_input):
@@ -336,7 +356,7 @@ def sig_remove(user_input):
                 for line in lines:
                     parsed_line = line.strip()
                     parsed_line = parsed_line.split(" | ")
-                    if parsed_line[6] != signature:
+                    if parsed_line[7] != signature:
                         signatures.write(line)
                 return
 
@@ -353,8 +373,8 @@ def sig_print():
             for line in siglist:
                 parsed_line = line.strip()
                 parsed_line = parsed_line.split(" | ")
-                print("Name: {}   Platform: {}   Service: {}   Rank: {}   Disclosed: {}   CVE: {}\nSignature: {}".format(parsed_line[0], parsed_line[1],
-                    parsed_line[2], parsed_line[3], parsed_line[4], parsed_line[5], parsed_line[6]))
+                print("Name: {}   Platform: {}   Service: {}   Rank: {}   Disclosed: {}   CVE: {}   Response: {}\nSignature: {}".format(parsed_line[0], parsed_line[1],
+                    parsed_line[2], parsed_line[3], parsed_line[4], parsed_line[5], parsed_line[6], parsed_line[7]))
                 print("---------------------------------\n")
 
 
@@ -365,7 +385,7 @@ def check_sig(signature):
             for line in signatures:
                 parsed_line = line.strip()
                 parsed_line = parsed_line.split(" | ")
-                if signature == parsed_line[6]:
+                if signature == parsed_line[7]:
                     return True    
     return False
 
@@ -459,10 +479,11 @@ def format_rank(rank):
     return rank
 
 
-def tests():
-    sig_print()
+def format_response(response):
+    response = response.strip()
+    response = response.casefold()
+    re_response = re.compile("^(none)|(block (([1-9][0-9][0-9])|([1-9][0-9])|([0-9])):(([1-9][0-9][0-9])|([1-9][0-9])|([0-9])):(([1-9][0-9][0-9])|([1-9][0-9])|([0-9])))$")
+    if re_response.match(response) == None:
+        return False, response
 
-if __name__ == "__main__":
-    tests()
-
-
+    return response

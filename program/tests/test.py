@@ -95,8 +95,14 @@ def test10():
     print(str(subprocess.check_output(["ufw deny from 10.10.10.2"])))
     print("command done")
 
+def test11():
+    if 00345 == 345:
+        print("True")
+    else:
+        print("False")
+
 
 if __name__ == "__main__":
-    test10()
+    test11()
 
 

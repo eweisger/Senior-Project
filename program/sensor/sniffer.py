@@ -20,7 +20,7 @@ def nids_sniffer():
     this_systems_ips = get_ips()
     conn = socket.socket(socket.AF_PACKET, socket.SOCK_RAW, socket.ntohs(3))
 
-    while True:
+    while True: 
         raw_data, addr = conn.recvfrom(65536)
         DT = datetime.datetime.now()
         destination_mac, source_mac, ethernet_protocol, data = format_ethernet_frame(raw_data)
@@ -86,7 +86,7 @@ def nids_sniffer():
 
 
 def packet_sniffer():
-    output = open('sniffer_output.txt', 'w+')
+    output = open('database/sniffer_output.txt', 'w+')
     this_systems_ips = get_ips()
 
     conn = socket.socket(socket.AF_PACKET, socket.SOCK_RAW, socket.ntohs(3))
