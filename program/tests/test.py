@@ -1,7 +1,12 @@
+import os
+import threading
+import time
 import re
 import ahocorasick
 import pickle
 import subprocess
+import multiprocessing
+import urllib.request
 
 def test():
     user_input = "test test test".split()
@@ -96,13 +101,49 @@ def test10():
     print("command done")
 
 def test11():
-    if 00345 == 345:
+    if 345 == 345:
         print("True")
     else:
         print("False")
 
 
+def test12():
+    print("parent start")
+    child = multiprocessing.Process(target = test13)
+    child.start()
+    for i in range(0,10):
+        time.sleep(1)
+        print(i)
+
+    if child.is_alive() != True:
+        print("child is not alive")
+    print("parent end")
+
+
+def test13():
+    print("child start")
+    time.sleep(5)
+    print("child end")
+
+
+def test14():
+    try:
+        external_ip = urllib.request.urlopen('https://ident.me').read().decode('utf8')
+        print(external_ip)
+    except:
+        print("error")
+
+
+def test15():
+    proc = subprocess.Popen(["tcpkill", "host", "10.10.10.2"], stdout = subprocess.DEVNULL, stderr = subprocess.DEVNULL)
+
+    time.sleep(5)
+
+    proc.kill()
+
+
+
 if __name__ == "__main__":
-    test11()
+    test15()
 
 

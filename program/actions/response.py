@@ -38,19 +38,16 @@ def determine_response(packet, values, blacklisted, blacklist_response):
         if packet.ipv4.protocol == "1":
             block_process = multiprocessing.Process(target = block_icmp, args = (packet, current_response, ))
             block_process.start()
-            block_process.join()
             return
 
         if packet.ipv4.protocol == "6":
             block_process = multiprocessing.Process(target = block_tcp, args = (packet, current_response, ))
             block_process.start()
-            block_process.join()
             return
 
         if packet.ipv4.protocol == "17":
             block_process = multiprocessing.Process(target = block_udp, args = (packet, current_response, ))
             block_process.start()
-            block_process.join()
             return
             
 
@@ -160,11 +157,11 @@ def block_icmp(packet, response):
     parsed_response = parsed_response[1].split(":")
     sleep_time = int(parsed_response[0])*60*60 + int(parsed_response[1])*60 + int(parsed_response[2])
 
-    subprocess.call(["ufw", "deny", "from", packet.ipv4.source])
+    subprocess.call(["ufw", "insert", "1", "deny", "from", packet.ipv4.source], stdout = subprocess.DEVNULL, stderr = subprocess.DEVNULL)
 
     time.sleep(sleep_time)
 
-    subprocess.call(["ufw", "delete", "deny", "from", packet.ipv4.source])
+    subprocess.call(["ufw", "delete", "deny", "from", packet.ipv4.source], stdout = subprocess.DEVNULL, stderr = subprocess.DEVNULL)
 
 
 def block_tcp(packet, response):
@@ -172,21 +169,23 @@ def block_tcp(packet, response):
     parsed_response = parsed_response[1].split(":")
     sleep_time = int(parsed_response[0])*60*60 + int(parsed_response[1])*60 + int(parsed_response[2])
 
-    subprocess.call(["ufw", "deny", "from", packet.ipv4.source, "port", packet.tcp.source_port])
+    subprocess.call(["ufw", "insert", "1", "deny", "from", packet.ipv4.source], stdout = subprocess.DEVNULL, stderr = subprocess.DEVNULL)
+    tcpkill = subprocess.call(["tcpkill", "host", packet.ipv4.source], stdout = subprocess.DEVNULL, stderr = subprocess.DEVNULL)
 
     time.sleep(sleep_time)
 
-    subprocess.call(["ufw", "delete", "deny", "from", packet.ipv4.source, "port", packet.tcp.source_port])
+    tcpkill.kill()
+    subprocess.call(["ufw", "delete", "deny", "from", packet.ipv4.source])
 
 def block_udp():
     parsed_response = response.split()
     parsed_response = parsed_response[1].split(":")
     sleep_time = int(parsed_response[0])*60*60 + int(parsed_response[1])*60 + int(parsed_response[2])
 
-    subprocess.call(["ufw", "deny", "from", packet.ipv4.source, "port", packet.udp.source_port])
+    subprocess.call(["ufw", "insert", "1", "deny", "from", packet.ipv4.source], stdout = subprocess.DEVNULL, stderr = subprocess.DEVNULL)
 
     time.sleep(sleep_time)
 
-    subprocess.call(["ufw", "delete", "deny", "from", packet.ipv4.source, "port", packet.udp.source_port])
+    subprocess.call(["ufw", "delete", "deny", "from", packet.ipv4.source], stdout = subprocess.DEVNULL, stderr = subprocess.DEVNULL)
 
 

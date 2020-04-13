@@ -53,7 +53,7 @@ def command_prompt():
         elif sniffer_manager(user_input) == True:
             pass
 
-        else:
+        elif user_input.casefold() != "exit":
             print("The input \"{}\" is not a command\n".format(user_input))
 
 
@@ -73,10 +73,10 @@ def run_sniffer():
     print("Running Packet Sniffer")
     print("----------------------")
     print("Hit enter to stop the sniffer and exit back to the command prompt\n")
+    #packet_sniffer()
     sniffer_process = multiprocessing.Process(target = packet_sniffer)
     sniffer_process.start()
     pid = sniffer_process.pid
-
 
 def run_NIDS():
     subprocess.call(["ufw", "enable"])
@@ -146,8 +146,8 @@ def handler(signal_recieved, frame):
     global pid
     if pid != None:
         os.kill(pid, signal.SIGTERM)
-        pid = None
     else:
+        print("Exiting program...")
         exit(0)
 
 

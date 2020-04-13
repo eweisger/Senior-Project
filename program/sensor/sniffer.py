@@ -5,6 +5,7 @@ import socket
 import struct
 import textwrap
 import datetime
+import urllib.request
 
 TAB_1 = '\t - '
 TAB_2 = '\t\t - '
@@ -293,13 +294,18 @@ def format_data(string):
     return string
 
 def get_ips():
-    s = str(subprocess.check_output(["ifconfig"]))
-    s = s.split()
+    try:
+        external_ip = urllib.request.urlopen('https://ident.me').read().decode('utf8')
+        return external_ip
+    
+    except:
+        s = str(subprocess.check_output(["ifconfig"]))
+        s = s.split()
 
-    this_ip = []
+        this_ip = []
 
-    for index, string in enumerate(s):
-        if string == "inet":
-            this_ip.append(s[index + 1])
+        for index, string in enumerate(s):
+            if string == "inet":
+                this_ip.append(s[index + 1])
 
-    return this_ip
+        return this_ip
