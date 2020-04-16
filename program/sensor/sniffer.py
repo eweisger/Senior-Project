@@ -87,7 +87,7 @@ def nids_sniffer():
 
 
 def packet_sniffer():
-    output = open('database/sniffer_output.txt', 'w+')
+    output = open('database/sniffer_output.txt', 'a+')
     this_systems_ips = get_ips()
 
     conn = socket.socket(socket.AF_PACKET, socket.SOCK_RAW, socket.ntohs(3))
@@ -132,6 +132,7 @@ def packet_sniffer():
                     output.write(TAB_2 + 'Data:\n')
                     output.write(format_multi_line(DATA_TAB_3, data) + "\n")
                     output.write("-----------------------------------\n\n")
+                    output.flush()
 
                     print(TAB_1 + 'ICMP Packet:')
                     print(TAB_2 + 'Type: {}, Code: {}, Checksum: {},'.format(icmp_type, code, checksum))
@@ -167,6 +168,7 @@ def packet_sniffer():
                     output.write(TAB_2 + 'Data:\n')
                     output.write(format_multi_line(DATA_TAB_3, data) + "\n")
                     output.write("-----------------------------------\n\n")
+                    output.flush()
 
                     print(TAB_1 + 'TCP Segment:')
                     print(TAB_2 + 'Source Port: {}, Destination Port: {}'.format(source_port, destination_port))
@@ -202,6 +204,7 @@ def packet_sniffer():
                     output.write(TAB_2 + 'Data:\n')
                     output.write(format_multi_line(DATA_TAB_3, data) + "\n")
                     output.write("-----------------------------------\n\n")
+                    output.flush
 
                     print(TAB_1 + 'UDP Segment:')
                     print(TAB_2 + 'Source Port: {}, Destination Port: {}, Length: {}'.format(source_port, destination_port, length))
@@ -229,6 +232,7 @@ def packet_sniffer():
                     output.write(TAB_1 + 'Data:\n')
                     output.write(format_multi_line(DATA_TAB_2, data) + "\n")
                     output.write("-----------------------------------\n\n")
+                    output.flush()
 
                     print(TAB_1 + 'Data:')
                     print(format_multi_line(DATA_TAB_2, data))
