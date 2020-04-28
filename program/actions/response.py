@@ -178,7 +178,7 @@ def block_tcp(packet, response):
 
     time.sleep(sleep_time)
     
-    subprocess.call(["ufw", "delete", "deny", "from", packet.ipv4.source])
+    subprocess.call(["ufw", "delete", "deny", "from", packet.ipv4.source], stdout = subprocess.DEVNULL, strderr = subprocess.DEVNULL)
 
 def block_udp():
     parsed_response = response.split()

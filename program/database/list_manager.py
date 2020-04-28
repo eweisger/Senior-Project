@@ -50,21 +50,21 @@ def whitelist_check(ip):
 def whitelist_add(user_input):
     if len(user_input) == 0:
         print("An IP address or domain name is required\n")
-        return
+        return False
 
     ip = check_ip_format(user_input)
     if ip[0] == False:
         print("The input \"{}\" is not a proper IP address".format(ip[1]))
-        print("IP addresses must be in the form n.n.n.n.n where n can be 0-255\n")
-        return
+        print("IP addresses must be in the form n.n.n.n where n can be 0-255\n")
+        return False
 
     if blacklist_check(ip) == True:
         print("The IP address, {}, is already in blacklist\n".format(ip)) 
-        return
+        return False
 
     if whitelist_check(ip) == True:
         print("The IP address, {}, is already in whitelist\n".format(ip))
-        return
+        return False
 
     with open("database/whitelist.txt", "a") as whitelist:
         whitelist.write(ip + "\n")
@@ -94,7 +94,7 @@ def blacklist_check(ip):
 def blacklist_add(user_input):
     if len(user_input) == 0:
         print("An IP address or domain name is required\n")
-        return
+        return False
 
     ip = ""
     for string in user_input:
@@ -106,16 +106,16 @@ def blacklist_add(user_input):
     ip = check_ip_format(ip)
     if ip[0] == False:
         print("The input \"{}\" is not a proper IP address".format(ip[1]))
-        print("IP addresses must be in the form n.n.n.n.n where n can be 0-255\n")
-        return
+        print("IP addresses must be in the form n.n.n.n where n can be 0-255\n")
+        return False
 
     if blacklist_check(ip) == True:
         print("The IP address, {}, is already in blacklist\n".format(ip)) 
-        return
+        return False
 
     if whitelist_check(ip) == True:
         print("The IP address, {}, is already in whitelist\n".format(ip))
-        return
+        return False
 
     with open("database/blacklist.txt", "a") as blacklist:
         if len(user_input) == 0:
@@ -127,7 +127,7 @@ def blacklist_add(user_input):
         for string in user_input:
             if string == "-re":
                 print("You can only have one response\n")
-                return
+                return False
             response = response + " " + string
             user_input = user_input[1:]
 
@@ -135,9 +135,10 @@ def blacklist_add(user_input):
         if response[0] == False:
             print("The input \"{}\" is not a proper response".format(response[1]))
             print("Responses must be \"none\" or in the format \"block h:m:s\", where h the number of hours, m is the number of minutes, and s is the number of seconds")
-            return
+            return False
 
         blacklist.write(ip + " | " + response + "\n")
+
 
 def blacklist_print():
     print("Blacklist")
@@ -155,13 +156,13 @@ def blacklist_print():
 def check_ip(user_input):
     if len(user_input) == 0:
         print("An IP address or domain name is required\n")
-        return
+        return False
 
     ip = check_ip_format(user_input)
     if ip[0] == False:
         print("The input \"{}\" is not a proper IP address".format(ip[1]))
-        print("IP addresses must be in the form n.n.n.n.n where n can be 0-255\n")
-        return
+        print("IP addresses must be in the form n.n.n.n where n can be 0-255\n")
+        return False
 
     if os.stat("database/blacklist.txt").st_size != 1:
         with open("database/blacklist.txt", "r") as blacklist:
@@ -183,13 +184,13 @@ def check_ip(user_input):
 def remove_ip(user_input):
     if len(user_input) == 0:
         print("An IP address or domain name is required\n")
-        return
+        return False
 
     ip = check_ip_format(user_input)
     if ip[0] == False:
         print("The input \"{}\" is not a proper IP address".format(ip[1]))
-        print("IP addresses must be in the form n.n.n.n.n where n can be 0-255\n")
-        return
+        print("IP addresses must be in the form n.n.n.n where n can be 0-255\n")
+        return False
 
     if blacklist_check(ip) == True:
         if os.stat("database/blacklist.txt").st_size != 1:
@@ -236,4 +237,3 @@ def format_response(response):
         return False, response
 
     return response
-
