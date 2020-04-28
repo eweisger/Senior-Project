@@ -1,3 +1,6 @@
+#Referenced youtube tutorials "Python Network Packet Snifffer Tutorials" from "thenewboston" 
+#when creating the basic packet sniffer before modifying it
+
 import collections
 from detector.detector import scan_packet
 import subprocess
