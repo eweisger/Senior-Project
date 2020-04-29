@@ -68,7 +68,7 @@ def welcome_message():
 def run_sniffer():
     print("Running Packet Sniffer")
     print("----------------------")
-    print("Press any key to stop the sniffer and exit back to the command prompt\n")
+    print("Press \"enter\" to stop the sniffer and exit back to the command prompt\n")
     sniffer_process = multiprocessing.Process(target = packet_sniffer)
     sniffer_process.start()
 
@@ -83,7 +83,7 @@ def run_NIDS():
     build_signature_database()
     print("Running Network Intrusion Detection System")
     print("------------------------------------------")
-    print("Press any key to stop the scanner and exit back to the command prompt\n")
+    print("Press \"enter\" to stop the scanner and exit back to the command prompt\n")
     nids_process = multiprocessing.Process(target = nids_sniffer)
     nids_process.start()
 
